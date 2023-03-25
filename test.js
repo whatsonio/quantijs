@@ -1,6 +1,3 @@
-/*
-Insperied by https://github.com/matomo-org/matomo/blob/5.x-dev/js/piwik.js
-*/
 
 ! function (e, t) {
     "undefined" != typeof module && module.exports ? module.exports = t() : "function" == typeof define && define.amd ? define(t) : e.Fingerprint = t()
