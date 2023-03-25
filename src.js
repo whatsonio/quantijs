@@ -368,8 +368,7 @@ if (typeof window.Quanti !== 'object') {
             var i = new XMLHttpRequest;
             i.open("POST", getValueFromKey("trackerUrl"), !0), i.setRequestHeader("Content-Type", "text/plain"), i.send(n), i.onreadystatechange = function () { }
 
-            console.log(_quti)
-            console.log('ready');
+
         }
 
         trackCallbackOnReady(function () {
@@ -379,7 +378,8 @@ if (typeof window.Quanti !== 'object') {
 
         trackCallbackOnBeforeUnload(function () {
 
-            send()
+            //if (getValueFromKey("event" != "(not set)"))
+            //send()
         });
 
     })();
