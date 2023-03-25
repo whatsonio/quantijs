@@ -374,12 +374,14 @@ if (typeof window.Quanti !== 'object') {
         trackCallbackOnReady(function () {
 
             send()
+            console.log("quanti ready")
+
         });
 
         trackCallbackOnBeforeUnload(function () {
 
-            //if (getValueFromKey("event" != "(not set)"))
-            //send()
+            if (getValueFromKey("event") != "(not set)")
+                send()
         });
 
     })();
