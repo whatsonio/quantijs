@@ -6,36 +6,26 @@
   <title>Quanti Tag project</title>
 
   <script type="text/javascript">
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
+    window._quantiDataLayer = window._quantiDataLayer || [];
 
-    gtag('js', new Date());
+    function _quantiTag() {
+      _quantiDataLayer.push(arguments);
+    }
 
-    gtag('config', 'TAG_ID');
-    gtag('pageView', 'TAG_ID');
-    gtag('event', 'TAG_ID');
-
-    console.log(dataLayer);
-
-
+    _quantiTag('trackerUrl', "http://localhost:8004/v1/ap/");
+    _quantiTag('accountId', "8e1980c1ec6c0f781a187775e644693f8e8b689a63206ca4c8c393d75ab1");
   </script>
   <script async src="./src-v2.js"></script>
 </head>
 
-
 <body>
-  <script>gtag('test2', 'TAG_ID');</script>
+  <!-- SCRIPT LAUNCHED WITH THE OLD _quantiTag -->
+  <script>_quantiTag('event', '2', 'VisitorType', 'Member');</script>
+  <script>_quantiTag('event', '3', 'VisitorType', 'Member');</script>
 
   <noscript>You need to enable JavaScript to run this app.</noscript>
   Test local quanti tag
-  <a href="#" onclick="javascript:gtag('event','1','VisitorType','Member'); void(0)">Test
-    event</a>
-
+  <a href="#" onclick="javascript:_quantiTag('event','1','VisitorType','Member'); void(0)">Test event</a>
 </body>
-
-
-
-
-
 
 </html>
