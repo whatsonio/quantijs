@@ -130,7 +130,7 @@
 
     function s(d, ff) {
         var i = new XMLHttpRequest;
-        i.open("POST", getValueFromKey("trackerUrl"), !0), i.setRequestHeader("Content-Type", "text/plain"), i.send(JSON.stringify(d)), i.onreadystatechange = function () {
+        i.open("POST", getValueFromKey("trackerUrl"), !0), i.setRequestHeader("Content-Type", "text/plain"), i.send(JSON.stringify({ d })), i.onreadystatechange = function () {
             if (ff !== undefined && i.readyState === 4 && i.status !== 200 && i.status !== 201) ff();
         }
     }
@@ -202,16 +202,17 @@
         if (_quantiDataLayer[v[0]][1] === "pageView") {
             // on envoie les données sans celles après l'event pageView (données non encore traités)
             s(_quantiDataLayer.slice(0, v[0] + 1));
+            // on change l'eventType pour éviter de renvoyer les données pageView, et si il reste des données elles sont forcément de type event
             _quantiDataLayer[v[0]][1] = "event";
         }
 
         // si il reste des données de type event non traités, on les envoient
         if (_quantiDataLayer.length > v[0] + 1) {
-            // on récupère les données après l'event pageView pour traiter leur envoi un par un (newEventArray)
+            // on récupère les données après la clé eventType pour traiter leur envoi un par un (newEventArray)
             var nea = _quantiDataLayer.slice(v[0] + 1);
 
             for (let i = 0; i < nea.length; i++) {
-                // on supprime l'event en question du tableau _quantiDataLayer
+                // on supprime l'event en question du tableau _quantiDataLayer pour qu'il ne soit pas envoyé en double si la fonction est rappelée
                 _quantiDataLayer.splice(v[0] + 1, 1);
 
                 // récupère les données jusqu'à l'eventType et ajoute l'event en cours (elementToPush)
@@ -220,12 +221,13 @@
 
                 // envoie les données
                 s(etp, function () {
-                    // /!\ Si l'envoi échoue, on réessaie de l'envoyer (cas requêtes infinies ?)
+                    // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
                     // _quantiTag(nea[i])
                 });
             }
         }
     }
 
+    // on appelle la fonction sans argument pour envoyer au minimum les données de l'eventType pageView, et celles de l'eventType event (si il y en a eu avant que le script soit chargé)
     _quantiTag();
 })();
