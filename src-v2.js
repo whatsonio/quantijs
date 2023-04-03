@@ -198,10 +198,14 @@
             }
         }
 
+
+
         // si il s'agit de l'event pageView, on envoie les données pour la première fois 
         if (_quantiDataLayer[v[0]][1] === "pageView") {
+            var i = new Date;
+            var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
             // on envoie les données sans celles après l'event pageView (données non encore traités)
-            s(_quantiDataLayer.slice(0, v[0] + 1));
+            s(_quantiDataLayer.slice(0, v[0] + 1).concat([date]));
             // on change l'eventType pour éviter de renvoyer les données pageView, et si il reste des données elles sont forcément de type event
             _quantiDataLayer[v[0]][1] = "event";
         }
@@ -211,18 +215,23 @@
             // on récupère les données après la clé eventType pour traiter leur envoi un par un (newEventArray)
             var nea = _quantiDataLayer.slice(v[0] + 1);
 
-            for (let i = 0; i < nea.length; i++) {
+            for (let j = 0; j < nea.length; j++) {
                 // on supprime l'event en question du tableau _quantiDataLayer pour qu'il ne soit pas envoyé en double si la fonction est rappelée
                 _quantiDataLayer.splice(v[0] + 1, 1);
 
                 // récupère les données jusqu'à l'eventType et ajoute l'event en cours (elementToPush)
                 var etp = _quantiDataLayer.slice(0, v[0] + 1);
-                etp.push(nea[i]);
+                etp.push(nea[j]);
+
+                // ajouter la date
+                var i = new Date;
+                var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
+                etp.push(date);
 
                 // envoie les données
                 s(etp, function () {
                     // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
-                    // _quantiTag(nea[i])
+                    // _quantiTag(nea[j])
                 });
             }
         }
