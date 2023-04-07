@@ -219,9 +219,12 @@
                 // on supprime l'event en question du tableau _quantiDataLayer pour qu'il ne soit pas envoyé en double si la fonction est rappelée
                 _quantiDataLayer.splice(v[0] + 1, 1);
 
-                // récupère les données jusqu'à l'eventType et ajoute l'event en cours (elementToPush)
+                // récupère les données jusqu'à l'eventType
                 var etp = _quantiDataLayer.slice(0, v[0] + 1);
-                etp.push(nea[j]);
+                // on ajoute les données de l'event après notre event type
+                for (var i = 0; i < nea[j].length; i++) {
+                    etp[etp.length - 1].push(nea[j][i]);
+                }
 
                 // ajouter la date
                 var i = new Date;
