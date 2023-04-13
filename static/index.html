@@ -12,8 +12,10 @@
       _quantiDataLayer.push(arguments);
     }
 
-    _quantiTag('trackerUrl', "https://api.tag.staging.apiquanti.net/v1/ap/");
-    _quantiTag('accountId', "996a98b2eb359e5ef446af4ad2bb57c9a6d9059cccb1e85fc1189cb74a3c");
+
+    _quantiTag('trackerUrl', " https://api.tag.staging.apiquanti.net/v1/ap/");
+    //_quantiTag('trackerUrl', "http://localhost:8004/v1/ap/");
+    _quantiTag('accountId', "c98720f24d7277d9ebc926cd10f8ef781230b8b281b53e3c0e2463ff5723");
   </script>
   <script async src="./src-v2.js"></script>
 </head>
@@ -22,6 +24,12 @@
   <!-- SCRIPT LAUNCHED WITH THE OLD _quantiTag -->
   <script>_quantiTag('event', '2', 'VisitorType', 'Member');</script>
   <script>_quantiTag('event', '3', 'VisitorType', 'Member');</script>
+
+  <script type="text/javascript">
+    _quantiTag('userId', "user_id_1234");
+    _quantiTag('conversionId', "conversion_id_1234");
+    _quantiTag('conversionValue', "conversion_value_8910");
+  </script>
 
   <noscript>You need to enable JavaScript to run this app.</noscript>
   Test local quanti tag

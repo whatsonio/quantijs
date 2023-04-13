@@ -170,7 +170,14 @@
             // on déplace les valeurs trackerUrl et accountId dans _quantiDataLayer
             var etd = [];
             for (var i = 0; i < ol.length; i++) {
-                if (ol[i][0] === "trackerUrl" || ol[i][0] === "accountId") {
+
+                if (
+                    ol[i][0] === "trackerUrl" ||
+                    ol[i][0] === "accountId" ||
+                    ol[i][0] === "userId" ||
+                    ol[i][0] === "conversionId" ||
+                    ol[i][0] === "conversionValue"
+                ) {
                     etd.push(i);
                     // passage des données sous forme de tableau, étant des arguments importés via l'ancienne fonction _quantiTag
                     var dta = [];
@@ -227,15 +234,15 @@
                 }
 
                 // ajouter la date
-                var i = new Date;
-                var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
-                etp.push(date);
+                //var i = new Date;
+                //var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
+                //etp.push(date);
 
                 // envoie les données
-                s(etp, function () {
-                    // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
-                    // _quantiTag(nea[j])
-                });
+                //s(etp, function () {
+                // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
+                // _quantiTag(nea[j])
+                //});
             }
         }
     }
