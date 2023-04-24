@@ -148,105 +148,68 @@
         return "desktop";
     };
 
+    function addOtherValuesToArray(arr, et) {
+        arr.push(["url", window.location.href]);
+        arr.push(["referrer", getReferrer()]);
+        arr.push(["visitorId", fp.get().toString()]);
+        arr.push(["deviceType", getDeviceType()]);
+        arr.push(['eventType', et]);
+    }
+
     // écraser la fonction _quantiTag
     _quantiTag = function () {
-        // passer les arguments sous l'objet Array au lieu de l'objet Arguments (pour supporter le JSON.stringify)
-        if (arguments.length !== 0) {
+        if (arguments.length !== 0) { // passer les arguments sous l'objet Array au lieu de l'objet Arguments (pour supporter le JSON.stringify)
             var d = [];
             for (var i = 0; i < arguments.length; i++) d.push(arguments[i]);
             _quantiDataLayer.push(d);
-        }
+        } else { // la fonction est appelée la première fois, on envoie un pageView
+            var dts = [];
 
-        // v[0] = index de eventType dans _quantiDataLayer OU undefined
-        var v = [];
-        for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] === "eventType") v.push(i);
-
-        // si eventType n'est pas défini, on le défini avec la valeur "pageView" pour le premier appel du send (s)
-        // signifie que c'est la première fois que le nouveau _quantiTag est appelé
-        if (v[0] === undefined) {
-            var ol = _quantiDataLayer;
-            _quantiDataLayer = [];
-
-            // on déplace les valeurs trackerUrl et accountId dans _quantiDataLayer
-            var etd = [];
-            for (var i = 0; i < ol.length; i++) {
-
-                if (
-                    ol[i][0] === "trackerUrl" ||
-                    ol[i][0] === "accountId" ||
-                    ol[i][0] === "userId" ||
-                    ol[i][0] === "conversionId" ||
-                    ol[i][0] === "conversionValue"
-                ) {
-                    etd.push(i);
-                    // passage des données sous forme de tableau, étant des arguments importés via l'ancienne fonction _quantiTag
-                    var dta = [];
-                    for (var j = 0; j < ol[i].length; j++) dta.push(ol[i][j]);
-                    _quantiDataLayer.push(dta);
-                }
+            for (var i = 0; i < _quantiDataLayer.length; i++) {
+                // passage des données sous forme de tableau, étant des arguments importés via l'ancienne fonction _quantiTag
+                var dta = [];
+                for (var j = 0; j < _quantiDataLayer[i].length; j++) dta.push(_quantiDataLayer[i][j])
+                _quantiDataLayer[i] = dta;
             }
-            // on supprime les valeurs trackerUrl et accountId de ol (oldLayer)
-            for (var i = etd.length - 1; i >= 0; i--) ol.splice(etd[i], 1);
 
-            // on ajoute les valeurs par défaut, dont l'eventType configuré pour le premier envoi
-            _quantiDataLayer.push(["url", window.location.href]);
-            _quantiDataLayer.push(["referrer", getReferrer()]);
-            _quantiDataLayer.push(["visiorId", fp.get().toString()]);
-            _quantiDataLayer.push(["deviceType", getDeviceType()]);
-            _quantiDataLayer.push(['eventType', "pageView"]);
-            // on ajoute l'index de eventType
-            v.push(_quantiDataLayer.length - 1);
+            // on déplace les valeurs qui ne sont pas des events dans dts
+            for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] !== "event") dts.push(_quantiDataLayer[i]);
 
-            // on ajoute les valeurs restantes de ol à _quantiDataLayer
-            for (var i = 0; i < ol.length; i++) {
-                var a = [];
-                for (var j = 0; j < ol[i].length; j++) a.push(ol[i][j]);
-                _quantiDataLayer.push(a);
-            }
+            // on envoie les données pageView + valeus supplémentaires obligatoires
+            addOtherValuesToArray(dts, "pageView")
+            s(dts);
         }
 
-
-
-        // si il s'agit de l'event pageView, on envoie les données pour la première fois 
-        if (_quantiDataLayer[v[0]][1] === "pageView") {
-            var i = new Date;
-            var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
-            // on envoie les données sans celles après l'event pageView (données non encore traités)
-            s(_quantiDataLayer.slice(0, v[0] + 1).concat([date]));
-            // on change l'eventType pour éviter de renvoyer les données pageView, et si il reste des données elles sont forcément de type event
-            _quantiDataLayer[v[0]][1] = "event";
+        // e[0] récupérer tout les events du tableau _quantiDataLayer, e[1] contient les index à supprimer du tableau _quantiDataLayer
+        var e = [[], []];
+        for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] === "event") {
+            e[0].push(_quantiDataLayer[i]);
+            e[1].push(i);
         }
 
-        // si il reste des données de type event non traités, on les envoient
-        if (_quantiDataLayer.length > v[0] + 1) {
-            // on récupère les données après la clé eventType pour traiter leur envoi un par un (newEventArray)
-            var nea = _quantiDataLayer.slice(v[0] + 1);
+        // si il y a un ou plusieurs events, on les envoie
+        if (e.length > 0) {
+            // suppression des events du tableau _quantiDataLayer
+            for (var i = e[1].length - 1; i >= 0; i--) _quantiDataLayer.splice(e[1][i], 1);
 
-            for (let j = 0; j < nea.length; j++) {
-                // on supprime l'event en question du tableau _quantiDataLayer pour qu'il ne soit pas envoyé en double si la fonction est rappelée
-                _quantiDataLayer.splice(v[0] + 1, 1);
+            for (let j = 0; j < e[1].length; j++) { // pour chaque event
+                // data to send tout sauf nos events (si jamais d'autres events ont été ajoutés)
+                var dts = [];
+                for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] !== "event") dts.push(_quantiDataLayer[i]);
+                // on ajoute l'event à la liste des données à envoyer
+                dts.push(e[0][j]);
 
-                // récupère les données jusqu'à l'eventType
-                var etp = _quantiDataLayer.slice(0, v[0] + 1);
-                // on ajoute les données de l'event après notre event type
-                for (var i = 0; i < nea[j].length; i++) {
-                    etp[etp.length - 1].push(nea[j][i]);
-                }
-
-                // ajouter la date
-                //var i = new Date;
-                //var date = ["date", i.getFullYear() + "-" + (i.getMonth() + 1) + "-" + i.getDate() + " " + i.getHours() + ":" + i.getMinutes() + ":" + i.getSeconds()];
-                //etp.push(date);
-
-                // envoie les données
-                //s(etp, function () {
-                // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
-                // _quantiTag(nea[j])
-                //});
+                // envoie les données de l'event
+                addOtherValuesToArray(dts, "event")
+                s(dts, function () {
+                    // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
+                    // _quantiTag(nea[j])
+                });
             }
         }
     }
 
-    // on appelle la fonction sans argument pour envoyer au minimum les données de l'eventType pageView, et celles de l'eventType event (si il y en a eu avant que le script soit chargé)
+    // on appelle la fonction sans argument pour envoyer au minimum les données de l'eventType pageView
+    // et celles de l'eventType event (si il y en a eu avant que le script soit chargé)
     _quantiTag();
 })();
