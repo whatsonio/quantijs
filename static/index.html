@@ -5,36 +5,37 @@
   <meta charset="utf-8" />
   <title>Quanti Tag project</title>
 
-  <!-- Script de page vue à intégrer sur toutes les pages, chargé avant le déclanchement d'events  -->
+  <!-- Page view script to include on all pages, loaded before events are triggered  -->
   <script type="text/javascript">
     window._quantiDataLayer = window._quantiDataLayer || [];
 
     function _quantiTag() {
       _quantiDataLayer.push(arguments);
     }
-    // <!> Les deux lignes suivantes sont obligatoires
-    // _quantiTag('trackerUrl', "https://api.tag.staging.apiquanti.net/v1/ap/");
+    /* <!> The following two lines are required */
+    /* _quantiTag('trackerUrl', "https://api.tag.staging.apiquanti.net/v1/ap/"); */
     _quantiTag('trackerUrl', "http://localhost:8004/v1/ap/");
     _quantiTag('accountId', "43ec6a75206e08d0afaf348db213e9318e65969b69ce9a0c0bf586275796");
 
-    // Informations optionnelles envoyé pour chaque hit (pageView et events)
+    /* Optional information sent for every hit (pageView and events) */
     // _quantiTag('userId', "user_id_1234");
     // _quantiTag('conversionId', "conversion_id_1234");
     // _quantiTag('conversionValue', "conversion_value_8910");
     // _quantiTag('conversionType', "conversion_type_1234");
   </script>
-  <script async src="./src-v2.js"></script>
+  <script async src="./src.js"></script>
 </head>
 
 <body>
   <!-- SCRIPT LAUNCHED WITH THE OLD _quantiTag -->
-  <!-- pop up évènement -->
+  <!-- event pop up -->
   <script>
-    // déclencher un event hit via cette fonction
-    // 1er element 'event' obligatoire non modifiable, les autres sont facultatifs (préciser '' si non utilisé et remplacer les valeurs par les vôtres)
-    _quantiTag('event', 'eventAction', 'eventLabel', 'eventValue');
+    /* trigger an event hit using this function */
+    /* 1st element 'event' mandatory and not editable */
+    _quantiTag('event', 'eventCategory', 'eventAction', 'eventLabel', 'eventValue');
+    /* other arguments are optional (replace the values by yours and specify empty string '' if not used) */
+    _quantiTag('event', 'call_to_action', 'add_to_cart', '', '99.99');
   </script>
-  <script>_quantiTag('event', '2', 'VisitorType', 'Member');</script>
 
   <noscript>You need to enable JavaScript to run this app.</noscript>
   Test local quanti tag
