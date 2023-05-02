@@ -23,6 +23,6 @@ jobs:
       - name: Auto committing minified files
         uses: JulesWhatson/git-auto-commit-action@v1.0
         with:
-          repository: 'minified'
+          repository: 'dist'
           commit_message: "Github Action: Auto Minified JS and CSS files"
           branch: ${{ github.ref }}
