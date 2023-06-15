@@ -11,16 +11,17 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so auto-minify job can access it
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.ref }}
-      - name: Minify-JS Action
-        uses: jossydevers/minify-js@v1.0.0
+
+      - name: Auto Minify
+        uses: JulesWhatson/auto-minify@v1.0
         with:
           directory: 'static'
           output: 'dist'
 
       # Auto commits minified files to the repository
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Auto committing minified files
+        uses: JulesWhatson/git-auto-commit-action@v1.0
         with:
-          commit_message: 'Minify-JS : Commit Pipeline'
+          repository: 'dist'
+          commit_message: "Github Action: Auto Minified JS and CSS files"
           branch: ${{ github.ref }}
