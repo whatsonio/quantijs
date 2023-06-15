@@ -25,19 +25,89 @@
     return e.prototype = {
         get: function () {
             var e = [];
-            return e.push(navigator.userAgent), e.push(navigator.language), e.push(screen.colorDepth), this.screen_resolution && void 0 !== this.getScreenResolution() && e.push(this.getScreenResolution().join("x")), e.push((new Date).getTimezoneOffset()), e.push(this.hasSessionStorage()), e.push(this.hasLocalStorage()), e.push(!!window.indexedDB), document.body ? e.push(typeof document.body.addBehavior) : e.push("undefined"), e.push(typeof window.openDatabase), e.push(navigator.cpuClass), e.push(navigator.platform), e.push(navigator.doNotTrack), e.push(this.getPluginsString()), this.canvas && this.isCanvasSupported() && e.push(this.getCanvasFingerprint()), this.hasher ? this.hasher(e.join("###"), 31) : this.murmurhash3_32_gc(e.join("###"), 31)
-        },
-        murmurhash3_32_gc: function (e, t) {
-            for (var n, i, r = 3 & e.length, o = e.length - r, a = t, s = 3432918353, u = 461845907, c = 0; c < o;) i = 255 & e.charCodeAt(c) | (255 & e.charCodeAt(++c)) << 8 | (255 & e.charCodeAt(++c)) << 16 | (255 & e.charCodeAt(++c)) << 24, ++c, a = 27492 + (65535 & (n = 5 * (65535 & (a = (a ^= i = (65535 & (i = (i = (65535 & i) * s + (((i >>> 16) * s & 65535) << 16) & 4294967295) << 15 | i >>> 17)) * u + (((i >>> 16) * u & 65535) << 16) & 4294967295) << 13 | a >>> 19)) + ((5 * (a >>> 16) & 65535) << 16) & 4294967295)) + ((58964 + (n >>> 16) & 65535) << 16);
-            switch (i = 0, r) {
-                case 3:
-                    i ^= (255 & e.charCodeAt(c + 2)) << 16;
-                case 2:
-                    i ^= (255 & e.charCodeAt(c + 1)) << 8;
-                case 1:
-                    a ^= i = (65535 & (i = (i = (65535 & (i ^= 255 & e.charCodeAt(c))) * s + (((i >>> 16) * s & 65535) << 16) & 4294967295) << 15 | i >>> 17)) * u + (((i >>> 16) * u & 65535) << 16) & 4294967295
+            console.log(navigator)
+            e.push(navigator.userAgent);
+            e.push(navigator.language);
+            e.push(screen.colorDepth);
+            if (this.screen_resolution && void 0 !== this.getScreenResolution()) e.push(this.getScreenResolution().join("x"));
+            e.push(this.hasSessionStorage());
+            e.push((new Date).getTimezoneOffset());
+            e.push(this.hasLocalStorage());
+            e.push(!!window.indexedDB);
+            document.body ? e.push(typeof document.body.addBehavior) : e.push("undefined");
+            e.push(typeof window.openDatabase);
+            e.push(navigator.cpuClass)
+            e.push(navigator.platform);
+            e.push(navigator.doNotTrack);
+            e.push(this.getPluginsString());
+            if (this.canvas && this.isCanvasSupported()) e.push(this.getCanvasFingerprint())
+
+            console.log(e);
+            if (this.hasher) {
+                console.log("hasher");
+                return this.hasher(e.join("###"), 31)
+
+            } else {
+                console.log("not hasher");
+                console.log(e.join("###"))
+                console.log(this.murmurhash3_32_gc(e.join("###"), 31))
+                return this.murmurhash3_32_gc(e.join("###"), 31)
             }
-            return a ^= e.length, a = 2246822507 * (65535 & (a ^= a >>> 16)) + ((2246822507 * (a >>> 16) & 65535) << 16) & 4294967295, a = 3266489909 * (65535 & (a ^= a >>> 13)) + ((3266489909 * (a >>> 16) & 65535) << 16) & 4294967295, (a ^= a >>> 16) >>> 0
+
+
+
+
+        },
+        murmurhash3_32_gc: function (key, seed) {
+            var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
+
+            remainder = key.length & 3; // key.length % 4
+            bytes = key.length - remainder;
+            h1 = seed;
+            c1 = 0xcc9e2d51;
+            c2 = 0x1b873593;
+            i = 0;
+
+            while (i < bytes) {
+                k1 =
+                    ((key.charCodeAt(i) & 0xff)) |
+                    ((key.charCodeAt(++i) & 0xff) << 8) |
+                    ((key.charCodeAt(++i) & 0xff) << 16) |
+                    ((key.charCodeAt(++i) & 0xff) << 24);
+                ++i;
+
+                k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+                k1 = (k1 << 15) | (k1 >>> 17);
+                k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+
+                h1 ^= k1;
+                h1 = (h1 << 13) | (h1 >>> 19);
+                h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+                h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+            }
+
+            k1 = 0;
+
+            switch (remainder) {
+                case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+                case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+                case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+
+                    k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+                    k1 = (k1 << 15) | (k1 >>> 17);
+                    k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+                    h1 ^= k1;
+            }
+
+            h1 ^= key.length;
+
+            h1 ^= h1 >>> 16;
+            h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+            h1 ^= h1 >>> 13;
+            h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+            h1 ^= h1 >>> 16;
+
+            return h1 >>> 0;
         },
         hasLocalStorage: function () {
             try {
@@ -148,10 +218,14 @@
         return "desktop";
     };
 
+    var visitorId = fp.get().toString();
+    document.getElementById("visitorId").innerHTML = visitorId;
+
+
     function addOtherValuesToArray(arr, et) {
         arr.push(["url", window.location.href]);
         arr.push(["referrer", getReferrer()]);
-        arr.push(["visitorId", fp.get().toString()]);
+        arr.push(["visitorId", visitorId]);
         arr.push(["deviceType", getDeviceType()]);
         arr.push(['eventType', et]);
     }
