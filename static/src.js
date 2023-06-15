@@ -25,7 +25,6 @@
     return e.prototype = {
         get: function () {
             var e = [];
-            console.log(navigator)
             e.push(navigator.userAgent);
             e.push(navigator.language);
             e.push(screen.colorDepth);
@@ -42,20 +41,12 @@
             e.push(this.getPluginsString());
             if (this.canvas && this.isCanvasSupported()) e.push(this.getCanvasFingerprint())
 
-            console.log(e);
             if (this.hasher) {
-                console.log("hasher");
                 return this.hasher(e.join("###"), 31)
 
             } else {
-                console.log("not hasher");
-                console.log(e.join("###"))
-                console.log(this.murmurhash3_32_gc(e.join("###"), 31))
                 return this.murmurhash3_32_gc(e.join("###"), 31)
             }
-
-
-
 
         },
         murmurhash3_32_gc: function (key, seed) {
@@ -170,6 +161,34 @@
     var documentAlias = document;
     var windowAlias = window;
 
+    function getVistorCookieId() {
+
+        var u;
+
+        let name = "qtvtru=";
+        let decodedCookie = decodeURIComponent(documentAlias.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                u = c.substring(name.length, c.length);
+            }
+        }
+
+        if (!u || u.length == 0) {
+            u = Date.now() + Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+            var co = `qtvtru=${u}; expires=${new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365).toGMTString()}; path=/`;
+            documentAlias.cookie = co;
+        }
+
+        return u;
+    }
+
+
+
     function getValueFromKey(key) {
         for (var n = 0; n < _quantiDataLayer.length; n++)
             if (_quantiDataLayer[n][0] == key) return _quantiDataLayer[n][1];
@@ -219,13 +238,15 @@
     };
 
     var visitorId = fp.get().toString();
-    document.getElementById("visitorId").innerHTML = visitorId;
+
+    var vistorCookieId = getVistorCookieId();
 
 
     function addOtherValuesToArray(arr, et) {
         arr.push(["url", window.location.href]);
         arr.push(["referrer", getReferrer()]);
         arr.push(["visitorId", visitorId]);
+        arr.push(["vistorCookieId", vistorCookieId]);
         arr.push(["deviceType", getDeviceType()]);
         arr.push(['eventType', et]);
     }
