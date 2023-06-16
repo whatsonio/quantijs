@@ -188,6 +188,27 @@
     }
 
 
+    function getGaCookieId() {
+
+        var u;
+
+        let name = "_ga=";
+        let decodedCookie = decodeURIComponent(documentAlias.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                u = c.substring(name.length, c.length);
+            }
+        }
+
+        return u;
+
+    }
+
 
     function getValueFromKey(key) {
         for (var n = 0; n < _quantiDataLayer.length; n++)
@@ -241,6 +262,7 @@
 
     var vistorCookieId = getVistorCookieId();
 
+    var gaCookieId = getGaCookieId();
 
     function addOtherValuesToArray(arr, et) {
         arr.push(["url", window.location.href]);
@@ -248,6 +270,10 @@
         arr.push(["visitorId", visitorId]);
         arr.push(["vistorCookieId", vistorCookieId]);
         arr.push(["deviceType", getDeviceType()]);
+        arr.push(["gaCookieId", gaCookieId]);
+        arr.push(['screenResolution', screen.height > screen.width ? `${screen.height}x${screen.width}` : `${screen.width}x${screen.height}`]);
+        arr.push(['userAgent', navigator.userAgent]);
+        arr.push(['cpuClass', navigator.cpuClass]);
         arr.push(['eventType', et]);
     }
 
