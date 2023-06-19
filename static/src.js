@@ -33,7 +33,7 @@
     }
 
 
-    function getGaCookieId() {
+    function getGaClientId() {
 
         var u;
 
@@ -99,14 +99,14 @@
 
     var visitorId = getVistorCookieId();
 
-    var gaCookieId = getGaCookieId();
+    var gaClientId = getGaClientId();
 
     function addOtherValuesToArray(arr, et) {
         arr.push(["url", window.location.href]);
         arr.push(["referrer", getReferrer()]);
         arr.push(["visitorId", visitorId]);
         arr.push(["deviceType", getDeviceType()]);
-        arr.push(["gaCookieId", gaCookieId]);
+        arr.push(["gaClientId", gaClientId]);
         arr.push(['screenResolution', screen.height > screen.width ? `${screen.height}x${screen.width}` : `${screen.width}x${screen.height}`]);
         arr.push(['userAgent', navigator.userAgent]);
         arr.push(['cpuClass', navigator.cpuClass]);
