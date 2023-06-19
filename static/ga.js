@@ -22,6 +22,7 @@
         a += a.toLowerCase() + "0123456789-_";
         return a + "."
     }
+
     var q, u;
 
     function ba(a) {
@@ -46,6 +47,10 @@
             64 != h && (c += String.fromCharCode(f << 4 & 240 | h >> 2), 64 != g && (c += String.fromCharCode(h << 6 & 192 | g)))
         }
     };
+
+    console.log(ba(r()))
+
+
     var v = {},
         w = function (a) {
             v.TAGGING = v.TAGGING || [];
