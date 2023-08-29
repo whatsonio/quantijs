@@ -110,7 +110,7 @@
         arr.push(['screenResolution', screen.height > screen.width ? `${screen.height}x${screen.width}` : `${screen.width}x${screen.height}`]);
         arr.push(['userAgent', navigator.userAgent]);
         arr.push(['cpuClass', navigator.cpuClass]);
-        arr.push(['eventType', et]);
+        arr.push(['event', et]);
     }
 
     // écraser la fonction _quantiTag
