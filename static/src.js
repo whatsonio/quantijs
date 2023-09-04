@@ -4,6 +4,30 @@
     var documentAlias = document;
     var windowAlias = window;
 
+    var knownProperties = [
+        ["trackerUrl", "string", "the trackerUrl property must be a string"],
+        ["accountId", "string", "the accountId property must be a string"],
+        ["url", "string", "the url property must be a string"],
+        ["referrer", "string", "the referrer property must be a string"],
+        ["visitorId", "string", "the visitorId property must be a string"],
+        ["deviceType", "string", "the deviceType property must be a string"],
+        ["gaClientId", "string", "the gaClientId property must be a string"],
+        ["screenResolution", "string", "the screenResolution property must be a string"],
+        ["userAgent", "string", "the userAgent property must be a string"],
+        ["cpuClass", "string", "the cpuClass property must be a string"],
+        ["date", "date", "the date property must be a valid date, with YYYY-MM-DD hh:mm:ss format"],
+        ["eventType", "eventType", "the eventType property must be event or pageView"],
+        ["eventCategory", "string", "the eventCategory property must be a string"],
+        ["eventAction", "string", "the eventAction property must be a string"],
+        ["eventLabel", "string", "the eventLabel property must be a string"],
+        ["eventValue", "string", "the eventValue property must be a string"],
+        ["userId", "string", "the userId property must be a string"],
+        ["conversionId", "string", "the conversionId property must be a string"],
+        ["conversionValue", "string", "the conversionValue property must be a string, and must be a float with a dot or a comma as decimal separator"],
+        ["conversionType", "string", "the conversionType property must be a string"],
+        ["consent", "string", "the consent property must be a string"],
+    ];
+
     function getVistorCookieId() {
 
         var u;
@@ -83,9 +107,13 @@
     }
 
     function s(d, ff) {
+        checkDatas(d);
         var i = new XMLHttpRequest;
         i.open("POST", getValueFromKey("trackerUrl"), !0), i.setRequestHeader("Content-Type", "text/plain"), i.send(JSON.stringify({ d })), i.onreadystatechange = function () {
-            if (ff !== undefined && i.readyState === 4 && i.status !== 200 && i.status !== 201) ff();
+            if ((i.readyState === 4 && i.responseText !== '"processed2"') || (i.status !== 200 && i.status !== 201)) {
+                console.warn("QUANTI : request failed", { status: i.status, responseText: i.responseText });
+                if (ff) ff();
+            }
         }
     }
 
@@ -106,11 +134,55 @@
         arr.push(["referrer", getReferrer()]);
         arr.push(["visitorId", visitorId]);
         arr.push(["deviceType", getDeviceType()]);
-        arr.push(["gaClientId", gaClientId]);
-        arr.push(['screenResolution', screen.height > screen.width ? `${screen.height}x${screen.width}` : `${screen.width}x${screen.height}`]);
-        arr.push(['userAgent', navigator.userAgent]);
-        arr.push(['cpuClass', navigator.cpuClass]);
-        arr.push(['eventType', et]);
+        arr.push(["screenResolution", screen.height > screen.width ? `${screen.height}x${screen.width}` : `${screen.width}x${screen.height}`]);
+        arr.push(["userAgent", navigator.userAgent]);
+        arr.push(["eventType", et]);
+        var cpu = navigator.cpuClass;
+        if (cpu) arr.push(["cpuClass", cpu]);
+        if (gaClientId) arr.push(["gaClientId", gaClientId]);
+    }
+
+    function checkDatas(d) {
+        for (var i = 0; i < d.length; i++) {
+            var found = false;
+            for (var j = 0; j < knownProperties.length; j++) {
+                if (d[i][0] === knownProperties[j][0]) {
+                    found = true;
+                    var specificTypes = ["eventType", "event", "date", "conversionValue"];
+                    var isSpecificType = false;
+
+                    for (var k = 0; k < specificTypes.length; k++) if (d[i][0] === specificTypes[k]) isSpecificType = true;
+
+                    if (!isSpecificType && typeof d[i][1] !== knownProperties[j][1]) {
+                        if (knownProperties[i][1] === "string" && typeof d[i][1] !== "string") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                        else if (knownProperties[i][1] === "integer" || knownProperties[i][1] === "float" && typeof d[i][1] !== "number") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                        else if (knownProperties[i][1] === "boolean" && typeof d[i][1] !== "boolean") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                    } else {
+                        switch (d[i][0]) {
+                            case "conversionValue":
+                                try {
+                                    var v = d[i][1];
+                                    if (typeof v !== "string") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                    else if (isNaN(parseFloat(v))) console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                } catch { console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] }) }
+                                break;
+                            case "eventType":
+                                if (d[i][1] !== "event" && d[i][1] !== "pageView") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                break;
+                            case "event":
+                                for (let k = 1; k < d[i].length; k++) if (typeof d[i][k] !== "string") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                break;
+                            case "date":
+                                var date = new Date(d[i][1]);
+                                if (date.toString() === "Invalid Date") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                break;
+                        }
+                    }
+                }
+            }
+            if (!found && typeof d[i][1] !== "string") console.warn(`QUANTI : the property ${d[i][0]} isn't a default property and must be a string`, { property: d[i][0], value: d[i][1] })
+
+        }
     }
 
     // écraser la fonction _quantiTag
