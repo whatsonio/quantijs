@@ -203,10 +203,8 @@
 
             // on déplace les valeurs qui ne sont pas des events dans dts
             for (var i = 0; i < _quantiDataLayer.length; i++) {
-                if (_quantiDataLayer[i][0] !== "event") {
-                    var a = []; // array avec clé et valeur stringifié
-                    a.push(_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1]))
-                    dts.push(a);
+                if (_quantiDataLayer[i][0] !== "event" && (_quantiDataLayer[i][1] != undefined || _quantiDataLayer[i][1] != null)) {
+                    dts.push([_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1])]); // on stringify la valeur
                 }
             }
 
@@ -231,10 +229,8 @@
                 // data to send tout sauf nos events (si jamais d'autres events ont été ajoutés)
                 var dts = [];
                 for (var i = 0; i < _quantiDataLayer.length; i++) {
-                    if (_quantiDataLayer[i][0] !== "event") {
-                        var a = []; // array avec clé et valeur stringifié
-                        a.push(_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1]))
-                        dts.push(a);
+                    if (_quantiDataLayer[i][0] !== "event" && (_quantiDataLayer[i][1] != undefined || _quantiDataLayer[i][1] != null)) {
+                        dts.push([_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1])]); // on stringify la valeur
                     }
                 }
                 // on ajoute l'event à la liste des données à envoyer
