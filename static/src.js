@@ -202,7 +202,13 @@
             }
 
             // on déplace les valeurs qui ne sont pas des events dans dts
-            for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] !== "event") dts.push(_quantiDataLayer[i]);
+            for (var i = 0; i < _quantiDataLayer.length; i++) {
+                if (_quantiDataLayer[i][0] !== "event") {
+                    var a = []; // array avec clé et valeur stringifié
+                    a.push(_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1]))
+                    dts.push(a);
+                }
+            }
 
             // on envoie les données pageView + valeus supplémentaires obligatoires
             addOtherValuesToArray(dts, "pageView")
@@ -224,7 +230,13 @@
             for (let j = 0; j < e[1].length; j++) { // pour chaque event
                 // data to send tout sauf nos events (si jamais d'autres events ont été ajoutés)
                 var dts = [];
-                for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] !== "event") dts.push(_quantiDataLayer[i]);
+                for (var i = 0; i < _quantiDataLayer.length; i++) {
+                    if (_quantiDataLayer[i][0] !== "event") {
+                        var a = []; // array avec clé et valeur stringifié
+                        a.push(_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1]))
+                        dts.push(a);
+                    }
+                }
                 // on ajoute l'event à la liste des données à envoyer
                 dts.push(e[0][j]);
 
