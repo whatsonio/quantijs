@@ -238,6 +238,10 @@
                             nK = "conversionValue";
                         } else if (k == "conversion_type") {
                             nK = "conversionType";
+                        } else if (k == "product_ids") {
+                            nK = "productIds";
+                        } else if (k == "tag_version") {
+                            nK = "tagVersion";
                         } else if (k == "event_category" || k == "event_action" || k == "event_label" || k == "event_value") {
                             break; // ignore les champs des events
                         }
