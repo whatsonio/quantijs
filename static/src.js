@@ -16,6 +16,7 @@
         ["userAgent", "string", "the userAgent property must be a string"],
         ["cpuClass", "string", "the cpuClass property must be a string"],
         ["date", "date", "the date property must be a valid date, with YYYY-MM-DD hh:mm:ss format"],
+        ["event", "event", "the event property must be an array with 5 strings"],
         ["eventType", "eventType", "the eventType property must be event or pageView"],
         ["eventCategory", "string", "the eventCategory property must be a string"],
         ["eventAction", "string", "the eventAction property must be a string"],
@@ -129,8 +130,7 @@
 
     var gaClientId = getGaClientId();
 
-    function addOtherValuesToArray(arr, et) {
-        arr.push(["url", window.location.href]);
+    function addDefaultValuesToArray(arr, et) {
         arr.push(["referrer", getReferrer()]);
         arr.push(["visitorId", visitorId]);
         arr.push(["deviceType", getDeviceType()]);
@@ -170,7 +170,7 @@
                                 if (d[i][1] !== "event" && d[i][1] !== "pageView") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
                                 break;
                             case "event":
-                                for (let k = 1; k < d[i].length; k++) if (typeof d[i][k] !== "string") console.warn(`QUANTI : ${knownProperties[j][2]}`, { property: d[i][0], value: d[i][1] })
+                                for (let k = 1; k < d[i].length; k++) if (typeof d[i][k] !== "string") console.warn(`QUANTI : this data must be a string`, { property: d[i][0], value: d[i][k] })
                                 break;
                             case "date":
                                 var date = new Date(d[i][1]);
@@ -191,53 +191,91 @@
             var d = [];
             for (var i = 0; i < arguments.length; i++) d.push(arguments[i]);
             _quantiDataLayer.push(d);
-        } else { // la fonction est appelée la première fois, on envoie un pageView
-            var dts = [];
-
-            for (var i = 0; i < _quantiDataLayer.length; i++) {
-                // passage des données sous forme de tableau, étant des arguments importés via l'ancienne fonction _quantiTag
-                var dta = [];
-                for (var j = 0; j < _quantiDataLayer[i].length; j++) dta.push(_quantiDataLayer[i][j])
-                _quantiDataLayer[i] = dta;
-            }
-
-            // on déplace les valeurs qui ne sont pas des events dans dts
-            for (var i = 0; i < _quantiDataLayer.length; i++) {
-                if (_quantiDataLayer[i][0] !== "event" && (_quantiDataLayer[i][1] != undefined || _quantiDataLayer[i][1] != null)) {
-                    dts.push([_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1])]); // on stringify la valeur
-                }
-            }
-
-            // on envoie les données pageView + valeus supplémentaires obligatoires
-            addOtherValuesToArray(dts, "pageView")
-            s(dts);
         }
 
-        // e[0] récupérer tout les events du tableau _quantiDataLayer, e[1] contient les index à supprimer du tableau _quantiDataLayer
+        // e[0] récupérer tout les hit du tableau _quantiDataLayer, e[1] contient les index à supprimer du tableau _quantiDataLayer
         var e = [[], []];
-        for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] === "event") {
+        for (var i = 0; i < _quantiDataLayer.length; i++) if (_quantiDataLayer[i][0] === "hit") {
             e[0].push(_quantiDataLayer[i]);
             e[1].push(i);
         }
 
-        // si il y a un ou plusieurs events, on les envoie
+        // si il y a un ou plusieurs hit, on les envoie
         if (e.length > 0) {
-            // suppression des events du tableau _quantiDataLayer
+            // suppression des hit du tableau _quantiDataLayer
             for (var i = e[1].length - 1; i >= 0; i--) _quantiDataLayer.splice(e[1][i], 1);
 
             for (let j = 0; j < e[1].length; j++) { // pour chaque event
-                // data to send tout sauf nos events (si jamais d'autres events ont été ajoutés)
+                var eventType = "event";
+
+                // mettre à jour le type d'event
+                if (e[0][j][1] == "page_view") {
+                    eventType = "pageView";
+                }
+
+                // data to send tout sauf nos hit (si jamais d'autres hit ont été ajoutés)
                 var dts = [];
+
                 for (var i = 0; i < _quantiDataLayer.length; i++) {
-                    if (_quantiDataLayer[i][0] !== "event" && (_quantiDataLayer[i][1] != undefined || _quantiDataLayer[i][1] != null)) {
+                    if (_quantiDataLayer[i][0] !== "hit" && (_quantiDataLayer[i][1] != undefined || _quantiDataLayer[i][1] != null)) {
                         dts.push([_quantiDataLayer[i][0], "".concat(_quantiDataLayer[i][1])]); // on stringify la valeur
                     }
                 }
-                // on ajoute l'event à la liste des données à envoyer
-                dts.push(e[0][j]);
+
+                // paramètres liés à l'event
+                for (const k in e[0][j][2]) {
+                    if (Object.hasOwnProperty.call(e[0][j][2], k)) {
+                        let nK = k;
+
+                        // renommage de champs
+                        if (k == "page_url") {
+                            nK = "url";
+                        } else if (k == "user_id") {
+                            nK = "userId";
+                        } else if (k == "conversion_id") {
+                            nK = "conversionId";
+                        } else if (k == "conversion_value") {
+                            nK = "conversionValue";
+                        } else if (k == "conversion_type") {
+                            nK = "conversionType";
+                        } else if (k == "event_category" || k == "event_action" || k == "event_label" || k == "event_value") {
+                            break; // ignore les champs des events
+                        }
+
+                        let element = e[0][j][2][k];
+                        if (element != undefined || element != null) {
+                            dts.push([nK, "".concat(element)]); // on stringify la valeur
+                        }
+                    }
+                }
+
+                if (eventType == "event") { // ajouter les valeurs par défaut des events
+                    var eTP = ["event"];
+                    if (e[0][j][2]["event_category"] != undefined || e[0][j][2]["event_category"] != null) {
+                        eTP.push(e[0][j][2]["event_category"]);
+                    } else {
+                        eTP.push("");
+                    }
+                    if (e[0][j][2]["event_action"] != undefined || e[0][j][2]["event_action"] != null) {
+                        eTP.push(e[0][j][2]["event_action"]);
+                    } else {
+                        eTP.push("");
+                    }
+                    if (e[0][j][2]["event_label"] != undefined || e[0][j][2]["event_label"] != null) {
+                        eTP.push(e[0][j][2]["event_label"]);
+                    } else {
+                        eTP.push("");
+                    }
+                    if (e[0][j][2]["event_value"] != undefined || e[0][j][2]["event_value"] != null) {
+                        eTP.push(e[0][j][2]["event_value"]);
+                    } else {
+                        eTP.push("");
+                    }
+                    dts.push(eTP);
+                }
 
                 // envoie les données de l'event
-                addOtherValuesToArray(dts, "event")
+                addDefaultValuesToArray(dts, eventType);
                 s(dts, function () {
                     // /!\ Si l'envoi échoue, on ajoute à nouveau l'event (cas requêtes infinies ?)
                     // _quantiTag(nea[j])
