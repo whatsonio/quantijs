@@ -7,6 +7,7 @@
     var knownProperties = [
         ["trackerUrl", "string", "the trackerUrl property must be a string"],
         ["accountId", "string", "the accountId property must be a string"],
+        ["domain", "string", "the domain property must be a string"],
         ["url", "string", "the url property must be a string"],
         ["referrer", "string", "the referrer property must be a string"],
         ["visitorId", "string", "the visitorId property must be a string"],
@@ -29,6 +30,12 @@
         ["consent", "string", "the consent property must be a string"],
     ];
 
+    function getRequiredDomain() {
+        for (var n = 0; n < _quantiDataLayer.length; n++) if (_quantiDataLayer[n][0] == "domain") return _quantiDataLayer[n][1];
+        console.warn("QUANTI : the domain property is recommended");
+        return false;
+    }
+
     function getVistorCookieId() {
 
         var u;
@@ -47,11 +54,10 @@
         }
 
         if (!u || u.length == 0) {
-            //u = Date.now() + Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+            let d = getRequiredDomain();
             u = Date.now().toString(32) + Math.random().toString(16);
-            var co = `qtvtru=${u}; expires=${new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365).toGMTString()}; path=/;`;
+            var co = `qtvtru=${u}; expires=${new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365).toGMTString()}; path=/; domain=${d}`;
             documentAlias.cookie = co;
-
         }
 
         return u;
