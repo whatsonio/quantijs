@@ -294,8 +294,7 @@
         }
     }
 
-    // on appelle la fonction sans argument pour envoyer au minimum les données de l'eventType pageView
-    // et celles de l'eventType event (si il y en a eu avant que le script soit chargé)
+    // on appelle la fonction sans argument pour envoyer les hits (event ou pageView) si jamais il y en a eu avant que le script soit chargé
     _quantiTag();
 })();
 

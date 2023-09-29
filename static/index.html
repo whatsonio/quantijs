@@ -10,24 +10,40 @@
     window._quantiDataLayer = window._quantiDataLayer || [];
 
     function _quantiTag() { _quantiDataLayer.push(arguments); }
-    _quantiTagVersion = "v1.7.2";
-    /* <!> The following two lines are required */
-    _quantiTag('trackerUrl', "https://api.tag.dev.apiquanti.net/v1/ap/");
-    // _quantiTag('trackerUrl', "http://localhost:8004/v1/ap/");
+    /* <!> The following three lines are required */
+    _quantiTag('trackerUrl', "https://api.tag.dev.apiquanti.net/v1/ap/"); // public tag apis
+    // _quantiTag('trackerUrl', "http://localhost:8004/v1/ap/"); // local tag apis
     _quantiTag('accountId', "tag-test");
     _quantiTag('domain', ".quanti.io");
 
-    /* Optional information sent for every hit (pageView and events) */
-    // _quantiTag('userId', "user_id_1234");
-    // _quantiTag('conversionId', "conversion_id_1234");
-    // _quantiTag('conversionValue', "9.99");
-    // _quantiTag('conversionType', "conversion_type_1234");
-    // _quantiTag('consent', "true");
+    // send page_view hit
+    // _quantiTag('hit', 'page_view', {
+    //   // optional parameters
+    //   // page_url: "",
+    //   // user_id: "",
+    //   // conversion_id: "",
+    //   // conversion_value: "",
+    //   // conversion_type: "",
+    //   // consent: "",
+    // });
 
-    // (function(w,d,s){var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://cdn.jsdelivr.net/gh/whatsonio/quantijs@'+_quantiTagVersion+'/dist/src.min.js';f.parentNode.insertBefore(j,f);})(window,document,'script');
+    // send event hit
+    // _quantiTag('hit', 'event', {
+    //   //   // optional parameters
+    //   // page_url: "",
+    //   // event_action: "",
+    //   // event_label: "",
+    //   // event_category: "",
+    //   // event_value: "",
+    //   // user_id: "",
+    //   // conversion_id: "",
+    //   // conversion_value: "",
+    //   // conversion_type: "",
+    //   // consent: "",
+    // });
   </script>
-  <script async src="./src.js"></script>
-  <!--<script async src="https://cdn.jsdelivr.net/gh/whatsonio/quantijs@latest/dist/src.min.js"></script>-->
+  <script async src="./src.js"></script> <!-- local tag, public is below -->
+  <!-- (function(w,d,s){var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://cdn.jsdelivr.net/gh/whatsonio/quantijs@v1.7.2/dist/src.min.js';f.parentNode.insertBefore(j,f);})(window,document,'script'); -->
 </head>
 
 <body>
