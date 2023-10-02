@@ -17,15 +17,15 @@
     _quantiTag('domain', ".quanti.io");
 
     // send page_view hit
-    // _quantiTag('hit', 'page_view', {
-    //   // optional parameters
-    //   // page_url: "",
-    //   // user_id: "",
-    //   // conversion_id: "",
-    //   // conversion_value: "",
-    //   // conversion_type: "",
-    //   // consent: "",
-    // });
+    _quantiTag('hit', 'page_view', {
+      //   // optional parameters
+      page_url: "",
+      user_id: "",
+      conversion_id: "",
+      conversion_value: "",
+      conversion_type: "",
+      consent: "",
+    });
 
     // send event hit
     // _quantiTag('hit', 'event', {
@@ -49,7 +49,19 @@
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   Test local quanti tag. Visitor Id is : <span id="visitorId"></span>
-  <a href="#" onclick="javascript:_quantiTag('hit','event', {'eventValue': '1'}); void(0)">Test event</a>
+  <a href="#"
+    onclick="javascript:_quantiTag('hit','event', {'eventValue': '1', 'conversion_id': '1234', 'conversion_value': '1234'}); void(0)">Test
+    event</a>
+  <a href="#" onclick="javascript:_quantiTag('hit', 'event', {
+    'eventValue': '1', 
+        'event_category': 'ecommerce',
+        'user_id': '{{dl_user_id}}',
+        'conversion_id': '{{dl_conversion_id}}',
+        'conversion_value': '{{dl_conversion_value}}',
+        'conversion_type': 'purchase',
+        'consent': ''
+      });; void(0)">Test
+    event 2</a>
 </body>
 
 </html>
